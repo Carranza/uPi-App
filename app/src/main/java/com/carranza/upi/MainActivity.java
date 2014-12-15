@@ -1,5 +1,6 @@
 package com.carranza.upi;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.MediaRouteActionProvider;
 import android.app.ProgressDialog;
@@ -17,6 +18,7 @@ import android.content.res.Configuration;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -424,5 +426,4 @@ public class MainActivity extends Activity {
 
     /*************************************************************/
     /*********************************************/
-
-}
+   }
