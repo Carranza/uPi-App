@@ -1,6 +1,14 @@
 package com.carranza.upi;
 
+import android.app.Dialog;
+import android.app.MediaRouteActionProvider;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaRouter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Fragment;
@@ -9,19 +17,32 @@ import android.content.res.Configuration;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends Activity {
+
+    private MediaRouter mMediaRouter;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -32,6 +53,15 @@ public class MainActivity extends Activity {
     private CustomDrawerAdapter adapter;
 
     private List<DrawerItem> dataList;
+
+    private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,14 +127,13 @@ public class MainActivity extends Activity {
                 SelectItem(0);
             }
         }
+
+        mMediaRouter = (MediaRouter) getSystemService(Context.MEDIA_ROUTER_SERVICE);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        return true;
+    protected void onRestart() {
+        super.onRestart();
     }
 
     @Override
@@ -196,9 +225,204 @@ public class MainActivity extends Activity {
         }
     }
 
+    /*
     public void openpdf(View view) {
         Intent i = new Intent(MainActivity.this, OpenPdf.class);
         startActivity(i);
-        // System.out.println("prueba");
+        System.out.println("adios");
     }
+    */
+
+    /******************************************************************/
+    /******************************************************************/
+    /******************************************************************/
+    /******************************************************************/
+    // MediaRouter
+    private final MediaRouter.SimpleCallback mMediaRouterCallback =
+            new MediaRouter.SimpleCallback() {
+
+                // BEGIN_INCLUDE(SimpleCallback)
+                /**
+                 * A new route has been selected as active. Disable the current
+                 * route and enable the new one.
+                 */
+                @Override
+                public void onRouteSelected(MediaRouter router, int type, MediaRouter.RouteInfo info) {
+                    // updatePresentation();
+                }
+
+                /**
+                 * The route has been unselected.
+                 */
+                @Override
+                public void onRouteUnselected(MediaRouter router, int type, MediaRouter.RouteInfo info) {
+                    // updatePresentation();
+
+                }
+
+                /**
+                 * The route's presentation display has changed. This callback
+                 * is called when the presentation has been activated, removed
+                 * or its properties have changed.
+                 */
+                @Override
+                public void onRoutePresentationDisplayChanged(MediaRouter router, MediaRouter.RouteInfo info) {
+                    // updatePresentation();
+                }
+                // END_INCLUDE(SimpleCallback)
+            };
+
+    /**
+     * Updates the displayed presentation to enable a secondary screen if it has
+     * been selected in the {@link android.media.MediaRouter} for the
+     * {@link android.media.MediaRouter#ROUTE_TYPE_LIVE_VIDEO} type. If no screen has been
+     * selected by the {@link android.media.MediaRouter}, the current screen is disabled.
+     * Otherwise a new {@link // SamplePresentation} is initialized and shown on
+     * the secondary screen.
+     */
+    /*
+    private void updatePresentation() {
+        /*
+
+        // BEGIN_INCLUDE(updatePresentationInit)
+        // Get the selected route for live video
+        MediaRouter.RouteInfo selectedRoute = mMediaRouter.getSelectedRoute(
+                MediaRouter.ROUTE_TYPE_LIVE_VIDEO);
+
+        // Get its Display if a valid route has been selected
+        Display selectedDisplay = null;
+        if (selectedRoute != null) {
+            selectedDisplay = selectedRoute.getPresentationDisplay();
+        }
+        // END_INCLUDE(updatePresentationInit)
+
+        // BEGIN_INCLUDE(updatePresentationDismiss)
+        /*
+         * Dismiss the current presentation if the display has changed or no new
+         * route has been selected
+         */
+        /*
+        if (mPresentation != null && mPresentation.getDisplay() != selectedDisplay) {
+            mPresentation.dismiss();
+            mPresentation = null;
+            mButton.setEnabled(false);
+            mTextStatus.setText(R.string.secondary_notconnected);
+        }
+        // END_INCLUDE(updatePresentationDismiss)
+
+        // BEGIN_INCLUDE(updatePresentationNew)
+        /*
+         * Show a new presentation if the previous one has been dismissed and a
+         * route has been selected.
+         */
+        /*
+        if (mPresentation == null && selectedDisplay != null) {
+
+            // Initialise a new Presentation for the Display
+            mPresentation = new SamplePresentation(this, selectedDisplay);
+            mPresentation.setOnDismissListener(mOnDismissListener);
+
+            // Try to show the presentation, this might fail if the display has
+            // gone away in the mean time
+            try {
+                mPresentation.show();
+                mTextStatus.setText(getResources().getString(R.string.secondary_connected,
+                        selectedRoute.getName(MainActivity.this)));
+                mButton.setEnabled(true);
+                showNextColor();
+            } catch (WindowManager.InvalidDisplayException ex) {
+                // Couldn't show presentation - display was already removed
+                mPresentation = null;
+            }
+        }
+        // END_INCLUDE(updatePresentationNew)
+    }*/
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // BEGIN_INCLUDE(onPause)
+        // Stop listening for changes to media routes.
+        mMediaRouter.removeCallback(mMediaRouterCallback);
+        // END_INCLUDE(onPause)
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        /*
+        // BEGIN_INCLUDE(onStop)
+        // Dismiss the presentation when the activity is not visible.
+        if (mPresentation != null) {
+            mPresentation.dismiss();
+            mPresentation = null;
+        }
+        // BEGIN_INCLUDE(onStop)*/
+    }
+
+    /**
+     * Inflates the ActionBar or options menu. The menu file defines an item for
+     * the {@link android.app.MediaRouteActionProvider}, which is registered here for all
+     * live video devices using {@link android.media.MediaRouter#ROUTE_TYPE_LIVE_VIDEO}.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // BEGIN_INCLUDE(MediaRouteActionProvider)
+        // Configure the media router action provider
+        MenuItem mediaRouteMenuItem = menu.findItem(R.id.menu_media_route);
+        MediaRouteActionProvider mediaRouteActionProvider =
+                (MediaRouteActionProvider) mediaRouteMenuItem.getActionProvider();
+        mediaRouteActionProvider.setRouteTypes(MediaRouter.ROUTE_TYPE_LIVE_VIDEO);
+        // BEGIN_INCLUDE(MediaRouteActionProvider)
+
+        return true;
+    }
+
+    /**
+     * Listens for dismissal of the {@link // SamplePresentation} and removes its
+     * reference.
+     */
+    /*
+    private final DialogInterface.OnDismissListener mOnDismissListener =
+            new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    if (dialog == mPresentation) {
+                        mPresentation = null;
+                    }
+                }
+            };
+
+    // Views used to display status information on the primary screen
+    private TextView mTextStatus;
+    private Button mButton;
+
+    // selected color index
+    private int mColor = 0;
+
+    // background colors
+    public int[] mColors;
+
+    /**
+     * Displays the next color on the secondary screen if it is activate.
+     */
+    /*
+    private void showNextColor() {
+        if (mPresentation != null) {
+            // a second screen is active and initialized, show the next color
+            mPresentation.setColor(mColors[mColor]);
+            mColor = (mColor + 1) % mColors.length;
+        }
+    }
+    */
+
+    /*************************************************************/
+    /*********************************************/
+
 }

@@ -1,22 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:gravity="center_horizontal"
+    android:orientation="vertical" android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.carranza.upi.MainActivity">
 
-    <ImageView
-        android:id="@+id/home_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+    <ScrollView android:id="@+id/main_form" android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/home_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <LinearLayout android:id="@+id/bluetooth_main_form" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_enable_bluetooth"
+                android:id="@+id/enable_bluetooth_button" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_disable_bluetooth"
+                android:id="@+id/disable_bluetooth_button" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_enable_bluetooth_visibility"
+                android:id="@+id/enable_bluetooth_visibility_button"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_open_attendance"
+                android:id="@+id/action_open_attendance_button"
+                android:onClick="requestOpenAttendance" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_set_attendance"
+                android:id="@+id/action_set_attendance_button" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -7,4 +7,11 @@
     <item android:id="@+id/action_log_out" android:title="@string/action_log_out"
         android:orderInCategory="100" app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/menu_media_route"
+        android:actionProviderClass="android.app.MediaRouteActionProvider"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+        android:title="Cast Button"
+        android:visible="true"/>
 </menu>
